@@ -1,0 +1,24 @@
+{
+  "label": "offsite",
+  "failures": 3,
+  "recoveries": 2,
+  "reminder": 1800,
+  "max_gap": 150,
+  "timeout": 5,
+  "publish_url": "http://127.0.0.1:2586",
+  "topic": "offsite-alerts",
+  "probes": {
+    "management_http": {
+      "kind": "https",
+      "ip": "192.0.2.10",
+      "port": 443,
+      "hostname": "management.example.net",
+      "path": "/v1/health"
+    },
+    "management_ssh": {"kind": "tcp", "ip": "192.0.2.10", "port": 22},
+    "core": {"kind": "tcp", "ip": "192.0.2.20", "port": 443},
+    "network": {"kind": "tcp", "ip": "192.0.2.30", "port": 53},
+    "public1": {"kind": "tcp", "ip": "198.51.100.10", "port": 443},
+    "public2": {"kind": "tcp", "ip": "203.0.113.10", "port": 443}
+  }
+}

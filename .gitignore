@@ -1,0 +1,30 @@
+# Local settings and credentials (examples contain no usable secrets).
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.pfx
+id_rsa*
+id_ed25519*
+publisher.json
+config.local.json
+secrets/
+# Runtime data, exports, and generated files.
+*.db
+*.db-*
+*.sqlite*
+*.sql
+*.dump
+*.tar*
+*.zip
+*.log
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+artifacts/
+data/
+backups/
+stacks/homepage/config/logs/

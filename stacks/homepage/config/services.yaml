@@ -1,0 +1,87 @@
+# Example destinations only; replace with your own reachable services.
+- Management:
+  - Homelab Manual:
+      href: https://docs.home.example.net
+      description: Wiki, network notes and recovery guides
+      icon: mdi-book-open-page-variant
+  - Portainer:
+      href: https://portainer.home.example.net
+      description: Containers and stacks
+      icon: mdi-docker
+  - Termix:
+      href: https://termix.home.example.net
+      description: SSH and remote consoles
+      icon: mdi-console
+  - NetBox:
+      href: https://netbox.home.example.net
+      description: Network inventory and IP addresses
+      icon: mdi-lan
+  - Semaphore:
+      href: https://semaphore.home.example.net
+      description: Maintenance automation and audits
+      icon: mdi-play-box-outline
+- Proxmox - LAN only:
+  - pve01:
+      href: https://192.0.2.11:8006/
+      description: Proxmox node - LAN only
+      icon: mdi-server
+  - pve02:
+      href: https://192.0.2.12:8006/
+      description: Proxmox node - LAN only
+      icon: mdi-server
+  - pve03:
+      href: https://192.0.2.13:8006/
+      description: Proxmox node - LAN only
+      icon: mdi-server
+- Network:
+  - UniFi:
+      href: https://unifi.home.example.net
+      description: Network controller
+      icon: mdi-access-point-network
+  - Technitium DNS:
+      href: https://dns.home.example.net
+      description: Internal DNS
+      icon: mdi-dns
+- Monitoring:
+  - Homelab overview:
+      href: https://grafana.home.example.net/d/homelab-overview/homelab-overview
+      description: Host and service health
+      icon: mdi-view-dashboard
+  - Prometheus:
+      href: https://prometheus.home.example.net
+      description: Metrics and queries
+      icon: mdi-chart-line
+  - Alertmanager:
+      href: https://alertmanager.home.example.net
+      description: Active alerts and silences
+      icon: mdi-alert-outline
+  - ntfy:
+      href: https://ntfy.home.example.net
+      description: Notifications
+      icon: mdi-bell-outline
+- Secrets:
+  - Vaultwarden:
+      href: https://vault.home.example.net
+      description: Password vault
+      icon: mdi-shield-key-outline
+  - Infisical:
+      href: https://infisical.home.example.net
+      description: Application secrets
+      icon: mdi-key-chain
+- AI and tools:
+  - Hermes:
+      href: https://hermes.home.example.net
+      description: Hermes interface
+      icon: mdi-robot-outline
+  - Open WebUI:
+      href: https://ai.example.net:8080/
+      description: AI chat - Tailscale required
+      icon: mdi-chat-outline
+  - Ollama Monitor:
+      href: https://ai.example.net:8081/
+      description: AI monitoring - Tailscale required
+      icon: mdi-pulse
+  - NEUROLLAMA:
+      href: https://ai.example.net:8811/
+      description: Model management - Tailscale required
+      icon: mdi-brain

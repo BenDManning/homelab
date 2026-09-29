@@ -1,0 +1,75 @@
+services:
+  bookstack:
+    image: lscr.io/linuxserver/bookstack:v26.09-ls285@sha256:5cf80598bb63bb7d475edb391af244f8ec5e9ac86018c197ad73a565e95a0012
+    environment:
+      PUID: "${PUID:-1000}"
+      PGID: "${PGID:-1000}"
+      TZ: "${TZ:-Etc/UTC}"
+      APP_URL: "${BOOKSTACK_APP_URL:-http://localhost:6875}"
+      APP_KEY: ${BOOKSTACK_APP_KEY:?generate and save the original application key}
+      DB_HOST: database
+      DB_PORT: '3306'
+      DB_USERNAME: bookstack
+      DB_PASSWORD: ${BOOKSTACK_DB_PASSWORD:?set a unique database password}
+      DB_DATABASE: bookstack
+      APP_PROXIES: "${BOOKSTACK_TRUSTED_PROXIES:-}"
+      SESSION_SECURE_COOKIE: "${BOOKSTACK_SECURE_COOKIE:-false}"
+      AVATAR_URL: 'false'
+      ALLOW_ROBOTS: 'false'
+    volumes:
+      - config:/config
+    ports:
+      - "${BIND_IP:-127.0.0.1}:${BOOKSTACK_PORT:-6875}:80"
+    networks:
+      - database
+      - frontend
+    depends_on:
+      database:
+        condition: service_healthy
+    restart: unless-stopped
+    mem_limit: 512m
+    cpus: 0.75
+    healthcheck:
+      test: [CMD, curl, -fsS, http://127.0.0.1/status]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '3'
+  database:
+    image: mariadb:11.4@sha256:70cc072b29b4a89ae07abb2d4da2c64678a7f2dfe092751bb51c87d67dc1338b
+    environment:
+      MARIADB_ROOT_PASSWORD: ${BOOKSTACK_DB_ROOT_PASSWORD:?set a different database root password}
+      MARIADB_DATABASE: bookstack
+      MARIADB_USER: bookstack
+      MARIADB_PASSWORD: ${BOOKSTACK_DB_PASSWORD:?set a unique database password}
+    command: [--innodb-buffer-pool-size=128M, --max-connections=30]
+    volumes:
+      - database:/var/lib/mysql
+    networks:
+      - database
+    restart: unless-stopped
+    mem_limit: 512m
+    cpus: 0.75
+    healthcheck:
+      test: [CMD, healthcheck.sh, --connect, --innodb_initialized]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 90s
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '3'
+volumes:
+  config:
+  database:
+networks:
+  database:
+    internal: true
+  frontend:

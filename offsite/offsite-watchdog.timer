@@ -1,0 +1,11 @@
+[Unit]
+Description=Observe home reachability from offsite once per minute
+
+[Timer]
+OnCalendar=minutely
+Persistent=true
+AccuracySec=1s
+Unit=offsite-watchdog.service
+
+[Install]
+WantedBy=timers.target

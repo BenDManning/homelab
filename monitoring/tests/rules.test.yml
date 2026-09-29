@@ -1,0 +1,509 @@
+rule_files:
+- ../rules/alerts.yml
+evaluation_interval: 1m
+tests:
+- name: endpoint outage and recovery
+  interval: 1m
+  input_series:
+  - series: probe_success{job="blackbox-http",instance="fixture.invalid"}
+    values: 1 0 0 0 1 1
+  alert_rule_test:
+  - eval_time: 2m
+    alertname: EndpointDown
+    exp_alerts: []
+  - eval_time: 3m
+    alertname: EndpointDown
+    exp_alerts:
+    - exp_labels:
+        job: blackbox-http
+        instance: fixture.invalid
+        severity: critical
+      exp_annotations:
+        summary: Endpoint probe failed
+  - eval_time: 4m
+    alertname: EndpointDown
+    exp_alerts: []
+- name: DNS probe outage and recovery
+  interval: 1m
+  input_series:
+  - series: probe_success{job="blackbox-dns",instance="dns.fixture.invalid",service="internal-dns"}
+    values: 1 0 0 0 1
+  alert_rule_test:
+  - eval_time: 2m
+    alertname: EndpointDown
+    exp_alerts: []
+  - eval_time: 3m
+    alertname: EndpointDown
+    exp_alerts:
+    - exp_labels:
+        job: blackbox-dns
+        instance: dns.fixture.invalid
+        service: internal-dns
+        severity: critical
+      exp_annotations:
+        summary: Endpoint probe failed
+  - eval_time: 4m
+    alertname: EndpointDown
+    exp_alerts: []
+- name: scrape failure and recovery
+  interval: 1m
+  input_series:
+  - series: up{job="node",instance="fixture.invalid:9100"}
+    values: 0 0 0 1
+  alert_rule_test:
+  - eval_time: 2m
+    alertname: ExporterDown
+    exp_alerts:
+    - exp_labels:
+        job: node
+        instance: fixture.invalid:9100
+        severity: critical
+      exp_annotations:
+        summary: Prometheus scrape failed
+  - eval_time: 3m
+    alertname: ExporterDown
+    exp_alerts: []
+- name: backup globally absent
+  interval: 1m
+  input_series: []
+  alert_rule_test:
+  - eval_time: 6m
+    alertname: BackupTelemetryMissing
+    exp_alerts:
+    - exp_labels:
+        severity: warning
+      exp_annotations:
+        summary: No successful backup timestamp has been observed in one hour
+- name: expected backup absent while another exists
+  interval: 1m
+  input_series:
+  - series: homelab_backup_expected{backup_job="example-backup"}
+    values: 1+0x61
+  - series: homelab_backup_last_success_timestamp_seconds{backup_job="other"}
+    values: 0+60x61
+  alert_rule_test:
+  - eval_time: 61m
+    alertname: ExpectedBackupMissing
+    exp_alerts:
+    - exp_labels:
+        backup_job: example-backup
+        severity: warning
+      exp_annotations:
+        summary: An expected backup has no success timestamp
+  - eval_time: 61m
+    alertname: BackupTelemetryMissing
+    exp_alerts: []
+- name: old backup
+  interval: 1m
+  input_series:
+  - series: homelab_backup_last_success_timestamp_seconds{backup_job="example-backup"}
+    values: 0+0x2220
+  alert_rule_test:
+  - eval_time: 37h
+    alertname: BackupTooOld
+    exp_alerts:
+    - exp_labels:
+        backup_job: example-backup
+        severity: critical
+      exp_annotations:
+        summary: Reported successful backup is older than 36 hours
+- name: high memory
+  interval: 1m
+  input_series:
+  - series: node_memory_MemAvailable_bytes{instance="fixture",job="node"}
+    values: 5+0x11
+  - series: node_memory_MemTotal_bytes{instance="fixture",job="node"}
+    values: 100+0x11
+  alert_rule_test:
+  - eval_time: 11m
+    alertname: HostHighMemory
+    exp_alerts:
+    - exp_labels:
+        instance: fixture
+        job: node
+        severity: warning
+      exp_annotations:
+        summary: Host memory usage above 90 percent
+- name: high CPU
+  interval: 1m
+  input_series:
+  - series: node_cpu_seconds_total{instance="fixture",job="node",cpu="0",mode="idle"}
+    values: 0+1x20
+  alert_rule_test:
+  - eval_time: 20m
+    alertname: HostHighCPU
+    exp_alerts:
+    - exp_labels:
+        instance: fixture
+        job: node
+        severity: warning
+      exp_annotations:
+        summary: Host CPU usage above 90 percent
+- name: filesystem space
+  interval: 1m
+  input_series:
+  - series: node_filesystem_avail_bytes{instance="fixture",device="sda",mountpoint="/",fstype="ext4"}
+    values: 5+0x11
+  - series: node_filesystem_size_bytes{instance="fixture",device="sda",mountpoint="/",fstype="ext4"}
+    values: 100+0x11
+  - series: node_filesystem_readonly{instance="fixture",device="sda",mountpoint="/",fstype="ext4"}
+    values: 0+0x11
+  alert_rule_test:
+  - eval_time: 11m
+    alertname: HostFilesystemLowSpace
+    exp_alerts:
+    - exp_labels:
+        instance: fixture
+        device: sda
+        mountpoint: /
+        fstype: ext4
+        severity: warning
+      exp_annotations:
+        summary: Host filesystem has less than 15 percent available
+- name: DNS-only inventory is not empty
+  interval: 1m
+  input_series:
+  - series: up{job="blackbox-dns",instance="dns.fixture.invalid"}
+    values: 1+0x16
+  alert_rule_test:
+  - eval_time: 16m
+    alertname: EndpointInventoryEmpty
+    exp_alerts: []
+- name: empty endpoint inventory waits before firing
+  interval: 1m
+  input_series: []
+  alert_rule_test:
+  - eval_time: 14m
+    alertname: EndpointInventoryEmpty
+    exp_alerts: []
+  - eval_time: 15m
+    alertname: EndpointInventoryEmpty
+    exp_alerts:
+    - exp_labels:
+        severity: info
+      exp_annotations:
+        summary: No endpoint probes configured
+- name: backup inventory absent waits before firing
+  interval: 1m
+  input_series: []
+  alert_rule_test:
+  - eval_time: 14m
+    alertname: BackupInventoryMissing
+    exp_alerts: []
+  - eval_time: 15m
+    alertname: BackupInventoryMissing
+    exp_alerts:
+    - exp_labels:
+        severity: warning
+      exp_annotations:
+        summary: Expected backup inventory metric is missing
+- name: backup inventory present even if no jobs enabled
+  interval: 1m
+  input_series:
+  - series: homelab_backup_expected{backup_job="disabled-example"}
+    values: 0+0x61
+  alert_rule_test:
+  - eval_time: 61m
+    alertname: BackupInventoryMissing
+    exp_alerts: []
+  - eval_time: 61m
+    alertname: ExpectedBackupMissing
+    exp_alerts: []
+- name: expected backup matches by globally unique backup_job
+  interval: 1m
+  input_series:
+  - series: homelab_backup_expected{backup_job="example-backup",instance="inventory.fixture.invalid"}
+    values: 1+0x61
+  - series: homelab_backup_last_success_timestamp_seconds{backup_job="example-backup",instance="emitter.fixture.invalid"}
+    values: 0+60x61
+  alert_rule_test:
+  - eval_time: 61m
+    alertname: ExpectedBackupMissing
+    exp_alerts: []
+  - eval_time: 61m
+    alertname: BackupTelemetryMissing
+    exp_alerts: []
+  - eval_time: 61m
+    alertname: BackupTooOld
+    exp_alerts: []
+  - eval_time: 61m
+    alertname: BackupTimestampInFuture
+    exp_alerts: []
+- name: future backup timestamp delay and recovery
+  interval: 1m
+  input_series:
+  - series: homelab_backup_last_success_timestamp_seconds{backup_job="example-backup"}
+    values: 10000+0x10 660
+  alert_rule_test:
+  - eval_time: 9m
+    alertname: BackupTimestampInFuture
+    exp_alerts: []
+  - eval_time: 10m
+    alertname: BackupTimestampInFuture
+    exp_alerts:
+    - exp_labels:
+        backup_job: example-backup
+        severity: warning
+      exp_annotations:
+        summary: Backup timestamp is more than five minutes in the future
+  - eval_time: 11m
+    alertname: BackupTimestampInFuture
+    exp_alerts: []
+- name: five minute timestamp skew is tolerated
+  interval: 1m
+  input_series:
+  - series: homelab_backup_last_success_timestamp_seconds{backup_job="example-backup"}
+    values: 300+60x11
+  alert_rule_test:
+  - eval_time: 11m
+    alertname: BackupTimestampInFuture
+    exp_alerts: []
+- name: old backup threshold hold and recovery
+  interval: 1m
+  input_series:
+  - series: homelab_backup_last_success_timestamp_seconds{backup_job="example-backup"}
+    values: 0+0x2176 130620
+  alert_rule_test:
+  - eval_time: 36h
+    alertname: BackupTooOld
+    exp_alerts: []
+  - eval_time: 36h15m
+    alertname: BackupTooOld
+    exp_alerts: []
+  - eval_time: 36h16m
+    alertname: BackupTooOld
+    exp_alerts:
+    - exp_labels:
+        backup_job: example-backup
+        severity: critical
+      exp_annotations:
+        summary: Reported successful backup is older than 36 hours
+  - eval_time: 36h17m
+    alertname: BackupTooOld
+    exp_alerts: []
+- name: textfile errors hold and clear
+  interval: 1m
+  input_series:
+  - series: node_textfile_scrape_error{job="node",instance="fixture.invalid"}
+    values: 1+0x5 0
+  alert_rule_test:
+  - eval_time: 4m
+    alertname: TextfileCollectorError
+    exp_alerts: []
+  - eval_time: 5m
+    alertname: TextfileCollectorError
+    exp_alerts:
+    - exp_labels:
+        job: node
+        instance: fixture.invalid
+        severity: warning
+      exp_annotations:
+        summary: Node exporter could not read textfile metrics
+  - eval_time: 6m
+    alertname: TextfileCollectorError
+    exp_alerts: []
+- name: PrometheusRuleEvaluationFailures sustained increments then recovery
+  interval: 1m
+  input_series:
+  - series: prometheus_rule_evaluation_failures_total{job="self",instance="fixture.invalid"}
+    values: 0+1x6 6+0x6
+  alert_rule_test:
+  - eval_time: 5m
+    alertname: PrometheusRuleEvaluationFailures
+    exp_alerts: []
+  - eval_time: 6m
+    alertname: PrometheusRuleEvaluationFailures
+    exp_alerts:
+    - exp_labels:
+        job: self
+        instance: fixture.invalid
+        severity: warning
+      exp_annotations:
+        summary: Prometheus rule evaluations are failing
+  - eval_time: 12m
+    alertname: PrometheusRuleEvaluationFailures
+    exp_alerts: []
+- name: AlertDeliveryFailures sustained increments then recovery
+  interval: 1m
+  input_series:
+  - series: alertmanager_notifications_failed_total{job="self",instance="fixture.invalid"}
+    values: 0+1x6 6+0x6
+  alert_rule_test:
+  - eval_time: 5m
+    alertname: AlertDeliveryFailures
+    exp_alerts: []
+  - eval_time: 6m
+    alertname: AlertDeliveryFailures
+    exp_alerts:
+    - exp_labels:
+        job: self
+        instance: fixture.invalid
+        severity: critical
+      exp_annotations:
+        summary: Alertmanager notification delivery is failing
+  - eval_time: 12m
+    alertname: AlertDeliveryFailures
+    exp_alerts: []
+- name: low inodes hold and recover
+  interval: 1m
+  input_series:
+  - series: node_filesystem_files_free{job="node",instance="fixture.invalid",device="disk",mountpoint="/",fstype="ext4"}
+    values: 5+0x10 30
+  - series: node_filesystem_files{job="node",instance="fixture.invalid",device="disk",mountpoint="/",fstype="ext4"}
+    values: 100+0x11
+  - series: node_filesystem_readonly{job="node",instance="fixture.invalid",device="disk",mountpoint="/",fstype="ext4"}
+    values: 0+0x11
+  alert_rule_test:
+  - eval_time: 9m
+    alertname: HostFilesystemLowInodes
+    exp_alerts: []
+  - eval_time: 10m
+    alertname: HostFilesystemLowInodes
+    exp_alerts:
+    - exp_labels:
+        job: node
+        instance: fixture.invalid
+        device: disk
+        mountpoint: /
+        fstype: ext4
+        severity: warning
+      exp_annotations:
+        summary: Host filesystem has less than 10 percent free inodes
+  - eval_time: 11m
+    alertname: HostFilesystemLowInodes
+    exp_alerts: []
+- name: readonly status must not cross scrape job boundaries
+  interval: 1m
+  input_series:
+  - series: node_filesystem_avail_bytes{job="node-a",instance="fixture.invalid",device="disk",mountpoint="/",fstype="ext4"}
+    values: 5+0x11
+  - series: node_filesystem_size_bytes{job="node-a",instance="fixture.invalid",device="disk",mountpoint="/",fstype="ext4"}
+    values: 100+0x11
+  - series: node_filesystem_files_free{job="node-a",instance="fixture.invalid",device="disk",mountpoint="/",fstype="ext4"}
+    values: 5+0x11
+  - series: node_filesystem_files{job="node-a",instance="fixture.invalid",device="disk",mountpoint="/",fstype="ext4"}
+    values: 100+0x11
+  - series: node_filesystem_readonly{job="node-a",instance="fixture.invalid",device="disk",mountpoint="/",fstype="ext4"}
+    values: 1+0x11
+  - series: node_filesystem_avail_bytes{job="node-b",instance="fixture.invalid",device="disk",mountpoint="/",fstype="ext4"}
+    values: 5+0x11
+  - series: node_filesystem_size_bytes{job="node-b",instance="fixture.invalid",device="disk",mountpoint="/",fstype="ext4"}
+    values: 100+0x11
+  - series: node_filesystem_files_free{job="node-b",instance="fixture.invalid",device="disk",mountpoint="/",fstype="ext4"}
+    values: 5+0x11
+  - series: node_filesystem_files{job="node-b",instance="fixture.invalid",device="disk",mountpoint="/",fstype="ext4"}
+    values: 100+0x11
+  - series: node_filesystem_readonly{job="node-b",instance="fixture.invalid",device="disk",mountpoint="/",fstype="ext4"}
+    values: 0+0x11
+  alert_rule_test:
+  - eval_time: 11m
+    alertname: HostFilesystemLowSpace
+    exp_alerts:
+    - exp_labels:
+        job: node-b
+        instance: fixture.invalid
+        device: disk
+        mountpoint: /
+        fstype: ext4
+        severity: warning
+      exp_annotations:
+        summary: Host filesystem has less than 15 percent available
+  - eval_time: 11m
+    alertname: HostFilesystemLowInodes
+    exp_alerts:
+    - exp_labels:
+        job: node-b
+        instance: fixture.invalid
+        device: disk
+        mountpoint: /
+        fstype: ext4
+        severity: warning
+      exp_annotations:
+        summary: Host filesystem has less than 10 percent free inodes
+- name: ephemeral filesystems excluded
+  interval: 1m
+  input_series:
+  - series: node_filesystem_avail_bytes{job="node",instance="fixture.invalid",device="tmpfs",mountpoint="/tmpfs",fstype="tmpfs"}
+    values: 1+0x11
+  - series: node_filesystem_size_bytes{job="node",instance="fixture.invalid",device="tmpfs",mountpoint="/tmpfs",fstype="tmpfs"}
+    values: 100+0x11
+  - series: node_filesystem_files_free{job="node",instance="fixture.invalid",device="tmpfs",mountpoint="/tmpfs",fstype="tmpfs"}
+    values: 1+0x11
+  - series: node_filesystem_files{job="node",instance="fixture.invalid",device="tmpfs",mountpoint="/tmpfs",fstype="tmpfs"}
+    values: 100+0x11
+  - series: node_filesystem_readonly{job="node",instance="fixture.invalid",device="tmpfs",mountpoint="/tmpfs",fstype="tmpfs"}
+    values: 0+0x11
+  - series: node_filesystem_avail_bytes{job="node",instance="fixture.invalid",device="overlay",mountpoint="/overlay",fstype="overlay"}
+    values: 1+0x11
+  - series: node_filesystem_size_bytes{job="node",instance="fixture.invalid",device="overlay",mountpoint="/overlay",fstype="overlay"}
+    values: 100+0x11
+  - series: node_filesystem_files_free{job="node",instance="fixture.invalid",device="overlay",mountpoint="/overlay",fstype="overlay"}
+    values: 1+0x11
+  - series: node_filesystem_files{job="node",instance="fixture.invalid",device="overlay",mountpoint="/overlay",fstype="overlay"}
+    values: 100+0x11
+  - series: node_filesystem_readonly{job="node",instance="fixture.invalid",device="overlay",mountpoint="/overlay",fstype="overlay"}
+    values: 0+0x11
+  - series: node_filesystem_avail_bytes{job="node",instance="fixture.invalid",device="squashfs",mountpoint="/squashfs",fstype="squashfs"}
+    values: 1+0x11
+  - series: node_filesystem_size_bytes{job="node",instance="fixture.invalid",device="squashfs",mountpoint="/squashfs",fstype="squashfs"}
+    values: 100+0x11
+  - series: node_filesystem_files_free{job="node",instance="fixture.invalid",device="squashfs",mountpoint="/squashfs",fstype="squashfs"}
+    values: 1+0x11
+  - series: node_filesystem_files{job="node",instance="fixture.invalid",device="squashfs",mountpoint="/squashfs",fstype="squashfs"}
+    values: 100+0x11
+  - series: node_filesystem_readonly{job="node",instance="fixture.invalid",device="squashfs",mountpoint="/squashfs",fstype="squashfs"}
+    values: 0+0x11
+  - series: node_filesystem_avail_bytes{job="node",instance="fixture.invalid",device="ramfs",mountpoint="/ramfs",fstype="ramfs"}
+    values: 1+0x11
+  - series: node_filesystem_size_bytes{job="node",instance="fixture.invalid",device="ramfs",mountpoint="/ramfs",fstype="ramfs"}
+    values: 100+0x11
+  - series: node_filesystem_files_free{job="node",instance="fixture.invalid",device="ramfs",mountpoint="/ramfs",fstype="ramfs"}
+    values: 1+0x11
+  - series: node_filesystem_files{job="node",instance="fixture.invalid",device="ramfs",mountpoint="/ramfs",fstype="ramfs"}
+    values: 100+0x11
+  - series: node_filesystem_readonly{job="node",instance="fixture.invalid",device="ramfs",mountpoint="/ramfs",fstype="ramfs"}
+    values: 0+0x11
+  - series: node_filesystem_avail_bytes{job="node",instance="fixture.invalid",device="nsfs",mountpoint="/nsfs",fstype="nsfs"}
+    values: 1+0x11
+  - series: node_filesystem_size_bytes{job="node",instance="fixture.invalid",device="nsfs",mountpoint="/nsfs",fstype="nsfs"}
+    values: 100+0x11
+  - series: node_filesystem_files_free{job="node",instance="fixture.invalid",device="nsfs",mountpoint="/nsfs",fstype="nsfs"}
+    values: 1+0x11
+  - series: node_filesystem_files{job="node",instance="fixture.invalid",device="nsfs",mountpoint="/nsfs",fstype="nsfs"}
+    values: 100+0x11
+  - series: node_filesystem_readonly{job="node",instance="fixture.invalid",device="nsfs",mountpoint="/nsfs",fstype="nsfs"}
+    values: 0+0x11
+  alert_rule_test:
+  - eval_time: 11m
+    alertname: HostFilesystemLowSpace
+    exp_alerts: []
+  - eval_time: 11m
+    alertname: HostFilesystemLowInodes
+    exp_alerts: []
+- name: strict memory and filesystem thresholds
+  interval: 1m
+  input_series:
+  - series: node_memory_MemAvailable_bytes{job="node",instance="fixture.invalid"}
+    values: 10+0x11
+  - series: node_memory_MemTotal_bytes{job="node",instance="fixture.invalid"}
+    values: 100+0x11
+  - series: node_filesystem_avail_bytes{job="node",instance="fixture.invalid",device="disk",mountpoint="/",fstype="ext4"}
+    values: 15+0x11
+  - series: node_filesystem_size_bytes{job="node",instance="fixture.invalid",device="disk",mountpoint="/",fstype="ext4"}
+    values: 100+0x11
+  - series: node_filesystem_files_free{job="node",instance="fixture.invalid",device="disk",mountpoint="/",fstype="ext4"}
+    values: 10+0x11
+  - series: node_filesystem_files{job="node",instance="fixture.invalid",device="disk",mountpoint="/",fstype="ext4"}
+    values: 100+0x11
+  - series: node_filesystem_readonly{job="node",instance="fixture.invalid",device="disk",mountpoint="/",fstype="ext4"}
+    values: 0+0x11
+  alert_rule_test:
+  - eval_time: 11m
+    alertname: HostHighMemory
+    exp_alerts: []
+  - eval_time: 11m
+    alertname: HostFilesystemLowSpace
+    exp_alerts: []
+  - eval_time: 11m
+    alertname: HostFilesystemLowInodes
+    exp_alerts: []
