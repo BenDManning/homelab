@@ -11,8 +11,9 @@ writer, where TLS ends, and how an alert survives a failed delivery.
 
 ## Infrastructure designs
 
-- **[DNS](docs/services/dns.md)** — my DNS kept breaking, so I built a
-  three-resolver cluster to make it more resilient.
+- **[DNS](docs/services/dns.md)** — my first, agent-deployed service was bound to
+  Tailscale and needed repair after power outages. I rebuilt it myself as a
+  three-resolver cluster without that bind.
 - **[PostgreSQL](docs/services/postgresql.md)** — a curiosity project that got
   more complicated than I expected, ending up with Patroni, etcd and HAProxy.
 - **[Certificates and routing](docs/services/access-and-identity.md)** — frontend

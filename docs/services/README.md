@@ -2,8 +2,9 @@
 
 These are a few things I have built in the lab, for different reasons:
 
-- [DNS](dns.md): my old setup kept breaking, so I built a cluster to make it more
-  resilient.
+- [DNS](dns.md): an agent deployed my first service with a Tailscale bind. After
+  repeated repairs following power outages, I rebuilt it myself as a cluster
+  without that bind.
 - [PostgreSQL](postgresql.md): I was bored, started watching a cluster-building
   series, and discovered how involved it was. I ended up using Patroni.
 - [Certificates and routing](access-and-identity.md): from frontend TLS to backend

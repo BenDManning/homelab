@@ -1,7 +1,11 @@
 # DNS: fixing something that kept breaking
 
-My DNS setup was fragile and broke frequently. I deployed a cluster because I
-wanted it to be more resilient.
+I let an agent deploy my first DNS service. It bound the service to Tailscale,
+and every time the power went out—which happened a lot—I ended up repairing
+DNS. That setup was more trouble than it was worth.
+
+I removed the agent's "help" and deployed a cluster myself, without the Tailscale
+bind. This project started with being tired of fixing my DNS.
 
 The cluster has three Technitium resolvers behind dnsdist. Keepalived manages the
 virtual address clients use, so they do not need to know which member is
