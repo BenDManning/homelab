@@ -12,6 +12,16 @@ virtual address clients use, so they do not need to know which member is
 answering. Technitium's native catalog replication distributes private
 authoritative zones. Recursive requests go through DNSCrypt on the same member.
 
+I gave each DNS server a different set of upstream resolvers and relays. The
+[public DNSCrypt directory](https://github.com/DNSCrypt/dnscrypt-resolvers/blob/master/v3/public-resolvers.md)
+includes independent, nonprofit, and company-operated services.
+I didn't want every member depending on the same upstreams. If a
+resolver or relay goes down, that reduces the chance of it taking out recursive
+DNS across the whole cluster. Different endpoints can still share infrastructure,
+so this is upstream diversity, not a guarantee against outages. DNSCrypt's
+[example configuration](https://github.com/DNSCrypt/dnscrypt-proxy/blob/master/dnscrypt-proxy/example-dnscrypt-proxy.toml)
+documents choosing resolver/relay pairs across operators and ISPs.
+
 ```mermaid
 flowchart LR
   C[Clients] -->|UDP/TCP DNS or DoT| V[Keepalived VIP / dnsdist]
