@@ -22,6 +22,16 @@ so this is upstream diversity, not a guarantee against outages. DNSCrypt's
 [example configuration](https://github.com/DNSCrypt/dnscrypt-proxy/blob/master/dnscrypt-proxy/example-dnscrypt-proxy.toml)
 documents choosing resolver/relay pairs across operators and ISPs.
 
+The separate paths are also about privacy and spreading trust: I don't want
+every member trusting the same upstreams. DNSCrypt encrypts and authenticates
+the upstream traffic. With
+[Anonymized DNSCrypt](https://github.com/DNSCrypt/dnscrypt-protocol/blob/master/ANONYMIZED-DNSCRYPT.txt),
+the relay sees my public address but cannot read the queries; the resolver sees
+the queries and the relay's address rather than mine. That separation depends on
+the relay and resolver being run by different operators. That's the design
+intent, not an audit of the selected operators' independence. Three paths don't
+make the encryption stronger or guarantee truthful answers from a resolver.
+
 ```mermaid
 flowchart LR
   C[Clients] -->|UDP/TCP DNS or DoT| V[Keepalived VIP / dnsdist]
