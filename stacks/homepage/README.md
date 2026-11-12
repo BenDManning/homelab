@@ -1,5 +1,14 @@
 # Homepage directory
 
+## Publication status — November 2026
+
+The Compose image/settings remain a retained example from the initial release;
+the service links have been refreshed as a sanitized five-node illustration.
+Neither is a current production export. All URLs are placeholders, including
+links for services whose application health was not checked. A directory entry
+is not a deployment or liveness assertion. Management/core retirement does not
+happen through this example. See [revision scope](../../docs/revision-2026-11.md).
+
 A links-only [Homepage](https://gethomepage.dev/) configuration with service
 search, descriptions, and a mobile search button. It contains no integration
 credentials or Docker socket mount. All destinations are examples.

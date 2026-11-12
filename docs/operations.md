@@ -1,84 +1,75 @@
-# Operations and boundaries
+# Operations and recovery boundaries
+
+## Current scope
+
+The [12 November inventory](inventory.md) supersedes the older three-node service
+map. Management and core-services VMs are running but due for retirement. Their
+retirement is a lifecycle requirement, not a completed migration or permission
+to stop them. Replacement placements and the remaining application inventory must
+be reconciled before a separate operational cutover.
+
+Repository changes do not update the lab. The public Compose files, monitoring
+rules and watchdog templates are selected examples, not authoritative current
+runtime configuration. In particular, the former statement that every management
+application belongs permanently on one VM no longer describes the intended layout.
 
 ## Access is more than DNS
 
-Most web applications follow `browser → internal DNS → Traefik → application`.
-DNS resolves a name; it does not provide a firewall. Network reachability, TLS,
-and application permissions are separate checks.
+Name resolution, network reachability, TLS identity and application authorization
+are separate boundaries. The documented proxy design separates frontend HTTPS,
+verified backend TLS and CA passthrough. See [access and identity](services/access-and-identity.md).
+Neither a successful HTTP status nor an open TCP port proves authenticated workflows.
 
-Homepage has no application login or special Homepage-only IP gate in this lab.
-The wiki allows reading and searching without login within existing network
-reachability; editing requires an account. Neither policy is a reason to expose
-an internal application on the public internet. The examples bind to loopback by
-default and do not create public DNS records, router forwards, or Tailnet ACLs.
+The local Compose examples bind to loopback by default and create no public DNS,
+router forwards, remote-access ACLs or certificate infrastructure. Their optional
+permission policies are historical examples, not freshly verified current lab policy.
+For stacks still managed by another deployment owner, a parallel Compose invocation
+is not a migration or safe takeover.
 
-Physical Proxmox nodes remain LAN-only. Termix uses stored SSH keys to reach
-nodes; installing Tailscale on the hypervisors is not required. AI sharing uses
-its own permitted paths, not the core management front door.
+## Monitoring is not delivery
 
-## Service ownership
+Published rules distinguish failed probes, failed scrapes and missing telemetry.
+The offsite code distinguishes classes of failed reachability checks. Neither
+establishes that the old monitoring stack or offsite observer is still deployed.
+No fresh end-to-end alert or phone-delivery test was performed during this revision.
 
-Portainer is the authority for stacks it manages. Use the files here as examples
-or recovery references, not as permission to run duplicate stacks alongside an
-existing installation. Changing a Compose file here does not update the live lab.
+An accepted notification means the server accepted it; it does not prove a phone
+rendered it. Routing, overlay and firewall faults can resemble a home power or
+ISP outage. Correlated symptoms do not establish the underlying cause.
 
-The management VM and Hermes VM have different jobs. Monitoring, Semaphore,
-Homepage, and BookStack belong on management; Hermes and its tooling belong on
-the Hermes VM. Moving a critical service, taking over an address, or deleting a
-workload is a separately planned change.
+## Recovery is scoped, not binary
 
-## Monitoring
+The September publication said scheduled backups awaited a NAS. That blanket
+statement is historical and is not carried forward as current status. Maintained
+November records describe some local CA/dashboard dump jobs and scoped restoration
+checks, plus earlier DNS recovery work. Their raw private receipts are not part of
+this public repository, and some checks predate subsequent configuration changes.
 
-Home monitoring observes host metrics, endpoint probes, and alert delivery. The
-offsite observer checks selected home paths without relying on the home's DNS
-resolver. Its separate ntfy subscription is useful when the home notification
-service cannot be reached.
+| Area | What the available record supports | What it does not establish |
+| --- | --- | --- |
+| DNS | Dated native backup/isolated-restore work reported | Fresh all-member recovery of the later transport configuration |
+| CA/dashboard | Local consumer dumps and selected restore parity reported | Loss-of-site recovery, root custody or complete dependency restoration |
+| PostgreSQL | Replication configuration and selected consumer checks documented | Full PostgreSQL/etcd cluster restore or forced-failover acceptance |
+| Entire lab | Five nodes online and selected service-manager states observed | Whole-home interruption/reconnection, reboot recovery, offsite automation or agreed RPO/RTO |
 
-An HTTP health check, successful notification enqueue, and a message appearing
-on a phone prove different things. Multi-target loss suggests a home or network
-path problem; it does not diagnose an ISP failure or power cut by itself.
+Replication, persistent volumes, HTML exports and configuration copies solve
+different problems. None is interchangeable with a consistent backup and a tested
+restore of current compatible data, identities and dependencies. No verified
+whole-lab recovery process is claimed here.
 
-Start diagnosis with the scope of the failure:
+## Changes and rollback
 
-1. Check whether the client can reach the intended network.
-2. Check DNS and TLS identity without bypassing certificate warnings.
-3. Compare proxy reachability with application health.
-4. Inspect the owning host and service logs before restarting anything.
-5. For alerts, distinguish missing metrics, failed probes, and failed delivery.
+Operational work needs its own target list, current backup source, dependency and
+quorum review, rollback boundary and application verification. This revision does
+not restart services, migrate workloads, retire VMs or change live DNS/TLS.
 
-## Maintenance
+For a route fault, a scoped current route preimage is different from a whole-host
+snapshot. For CA/database recovery, stale snapshots can discard newer shared state.
+For BookStack, the original application key, database and uploaded files belong
+together; an HTML export is offline reading, not an application backup.
 
-Semaphore runs read-only audits separately from manual update/reboot jobs.
-Audits inspect host services, cached package candidates, cluster state, and
-existing containers; they are not automatic patching or fresh vulnerability
-scans. The full private inventory and privileged maintenance runner are not
-included here.
+Unresolved work includes full current-system recovery/failover/reboot acceptance,
+delivered monitoring alerts, automatic offsite retention, agreed RPO/RTO and
+completion of the management/core-services retirement plan.
 
-Before a disruptive change: agree on targets and a maintenance window, establish
-a usable backup and rollback path, check cluster quorum and affected guests,
-then change one bounded group and verify the actual applications afterward.
-A controller VM running on the node being rebooted is a dependency to plan for,
-not a routine unattended operation.
-
-## Backup status
-
-Scheduled backup implementation is deferred until a NAS is available. Existing
-copies have not been represented as comprehensive coverage. **NOT PROTECTED**
-is the accurate recovery status; no full restore drill is claimed.
-
-Future protection needs to cover application data and external dependencies:
-
-- BookStack: a consistent database backup, uploaded files/config volume, and the
-  original application key and database credentials stored outside Git.
-- Monitoring: relevant application databases and configuration, with secrets
-  recovered through the established secret store.
-- Infrastructure: DNS/proxy/network configuration and an independent recovery
-  path to the hypervisors and secret store.
-
-Test restoration on an isolated destination before relying on it. BookStack's
-**Export → Contained Web File (HTML)** is useful offline reading, not an
-application backup. Never rotate `APP_KEY` as a routine BookStack upgrade step.
-
-The original lab temporarily suppresses selected missing/overdue-backup phone
-reminders while retaining the rules and a visible unprotected status. This is an
-acknowledged gap, not a recommended default for another deployment.
+[Evidence ledger](verification.md) · [Revision scope](revision-2026-11.md)

@@ -1,4 +1,5 @@
-# Example destinations only; replace with your own reachable services.
+# Illustrative directory, not live inventory or an export. All destinations are examples.
+# Five-node map: 2026-11-12. Management/core VM retirement is pending.
 - Management:
   - Homelab Manual:
       href: https://docs.home.example.net
@@ -33,6 +34,14 @@
       href: https://192.0.2.13:8006/
       description: Proxmox node - LAN only
       icon: mdi-server
+  - pve04:
+      href: https://192.0.2.14:8006/
+      description: Proxmox node - LAN only
+      icon: mdi-server
+  - pve05:
+      href: https://192.0.2.15:8006/
+      description: Proxmox node - LAN only
+      icon: mdi-server
 - Network:
   - UniFi:
       href: https://unifi.home.example.net
@@ -59,6 +68,15 @@
       href: https://ntfy.home.example.net
       description: Notifications
       icon: mdi-bell-outline
+- Identity:
+  - Certificate authority:
+      href: https://ca.example.net
+      description: step-ca endpoint - illustrative, not a browser dashboard
+      icon: mdi-certificate
+  - CA administration:
+      href: https://ca-admin.home.example.net
+      description: Scoped certificate administration - example frontend
+      icon: mdi-certificate-outline
 - Secrets:
   - Vaultwarden:
       href: https://vault.home.example.net
@@ -69,9 +87,9 @@
       description: Application secrets
       icon: mdi-key-chain
 - AI and tools:
-  - Hermes:
-      href: https://hermes.home.example.net
-      description: Hermes interface
+  - OpenClaw:
+      href: https://openclaw.home.example.net
+      description: Agent gateway - example frontend
       icon: mdi-robot-outline
   - Open WebUI:
       href: https://ai.example.net:8080/

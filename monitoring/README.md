@@ -1,5 +1,13 @@
 # Monitoring excerpts
 
+## Publication status — November 2026
+
+These rules and fixtures remain published examples. The current runtime inspection
+did not inspect the monitoring stack or establish delivered alerts. Do not infer
+that every monitoring application from the older management-VM map is running.
+Original validation claims below are historical; the [verification ledger](../docs/verification.md)
+records checks actually performed during this revision.
+
 Reusable Prometheus alert rules, behavior tests, and an Alertmanager routing
 example—not a deployable stack. No inventory, exporters, backup jobs, credentials,
 deployment automation, or notification service is included.
@@ -64,11 +72,11 @@ The failure-counter rules require a positive 5-minute increase to persist for
 
 A timestamp is an emitter's claim, not proof of restore testing, offsite storage,
 or backup integrity. These excerpts neither create backups nor establish that
-an installation is protected. In the owner's deployment, scheduled backups are
-deferred pending a NAS: **NOT PROTECTED**. That deployment backs off recurring
-missing/overdue-backup reminders while retaining alert visibility. This is
-context, not a recommendation to disable backup notifications elsewhere, and
-that suppression route is deliberately **not** included here.
+an installation is protected. The initial September deployment deferred scheduled
+backups pending a NAS and suppressed selected recurring phone reminders. That is
+historical context, not a current all-system backup assessment or a recommendation
+to disable notifications elsewhere. That suppression route is deliberately **not**
+included here. See the [current recovery boundary](../docs/operations.md#recovery-is-scoped-not-binary).
 
 ## Local validation
 
@@ -77,7 +85,8 @@ cached. Commands use `--pull never`, no network, read-only mounts, and disposabl
 native tool entrypoints. Run from this directory. They create no files here,
 start no monitoring services, and contact no targets or notification endpoints.
 
-Validated with Prometheus/promtool **3.14.0** and Alertmanager/amtool **0.34.1**:
+The original publication reports validation with Prometheus/promtool **3.14.0**
+and Alertmanager/amtool **0.34.1** (not independently rerun in this revision):
 
 ```sh
 PROM_IMAGE='prom/prometheus@sha256:5ce7540c3c00ef4ab0c9d2c995c6a5b9c421f44b4a115d97a2c7af3b1c21cbb0'

@@ -1,33 +1,45 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 870" role="img" aria-labelledby="title desc">
-<title id="title">Homelab roles and access paths</title>
-<desc id="desc">Three Proxmox nodes host six guests. pve01 hosts DNS, management and time. pve02 hosts core services and Hermes. pve03 hosts AI. An external VPS checks home paths and sends independent alerts. Placement is a dated snapshot, not a high-availability claim.</desc>
-<defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#1e293b" stroke-width=".5"/></pattern>
-<marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8" fill="none" stroke="#94a3b8"/></marker></defs>
-<style>text{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;fill:#e2e8f0}.title{font-size:24px;font-weight:700}.name{font-size:17px;font-weight:600}.small{font-size:13px;fill:#cbd5e1}.note{font-size:12px;fill:#94a3b8}.group{fill:#020617;stroke:#64748b;stroke-dasharray:8 4}.line{fill:none;stroke:#94a3b8;stroke-width:1.5;marker-end:url(#arrow)}</style>
-<rect width="1200" height="870" rx="12" fill="#020617"/><rect width="1200" height="870" rx="12" fill="url(#grid)"/>
-<text x="36" y="44" class="title">HOMELAB / roles, not a flat pile of services</text>
-<text x="36" y="70" class="small">Placement snapshot · 2026-09-28 · addresses and identities omitted</text>
-<rect x="30" y="172" width="1140" height="416" rx="12" class="group"/>
-<text x="48" y="198" class="small">HOME · Proxmox management remains LAN-only</text>
-<!-- Draw connections before opaque component cards. -->
-<path d="M600 146V235" class="line"/><text x="613" y="162" class="note">internal DNS + HTTPS</text>
-<path d="M415 276H390V345H365" class="line"/>
-<path d="M50 431H40V640H180V674" class="line" stroke-dasharray="5 5"/>
-<path d="M845 674V618H385V399H365" class="line" stroke-dasharray="5 5"/>
-<text x="440" y="645" class="note">Selected home-path checks / Tailscale</text>
-<g><rect x="420" y="92" width="360" height="54" rx="6" fill="#0f172a"/><rect x="420" y="92" width="360" height="54" rx="6" fill="#22d3ee" fill-opacity=".09" stroke="#22d3ee" stroke-width="1.5"/><text x="436" y="119" class="name">Browser / permitted client</text></g>
-<text x="50" y="226" class="name">pve01</text>
-<text x="420" y="226" class="name">pve02</text>
-<text x="790" y="226" class="name">pve03</text>
-<g><rect x="50" y="245" width="315" height="76" rx="6" fill="#0f172a"/><rect x="50" y="245" width="315" height="76" rx="6" fill="#34d399" fill-opacity=".09" stroke="#34d399" stroke-width="1.5"/><text x="66" y="272" class="name">Network services · VM</text><text x="66" y="297" class="small">Technitium DNS</text></g>
-<g><rect x="50" y="337" width="315" height="118" rx="6" fill="#0f172a"/><rect x="50" y="337" width="315" height="118" rx="6" fill="#34d399" fill-opacity=".09" stroke="#34d399" stroke-width="1.5"/><text x="66" y="364" class="name">Management · VM</text><text x="66" y="389" class="small">Metrics + alerts · Semaphore</text><text x="66" y="411" class="small">Homepage + BookStack</text><text x="66" y="433" class="small">Local controller stays here</text></g>
-<g><rect x="50" y="471" width="315" height="76" rx="6" fill="#0f172a"/><rect x="50" y="471" width="315" height="76" rx="6" fill="#34d399" fill-opacity=".09" stroke="#34d399" stroke-width="1.5"/><text x="66" y="498" class="name">Network time · LXC</text><text x="66" y="523" class="small">Chrony</text></g>
-<g><rect x="420" y="245" width="315" height="118" rx="6" fill="#0f172a"/><rect x="420" y="245" width="315" height="118" rx="6" fill="#fb7185" fill-opacity=".09" stroke="#fb7185" stroke-width="1.5"/><text x="436" y="272" class="name">Core services · VM</text><text x="436" y="297" class="small">Traefik · Portainer · Termix</text><text x="436" y="319" class="small">NetBox · Vaultwarden</text><text x="436" y="341" class="small">Infisical</text></g>
-<g><rect x="420" y="401" width="315" height="91" rx="6" fill="#0f172a"/><rect x="420" y="401" width="315" height="91" rx="6" fill="#22d3ee" fill-opacity=".09" stroke="#22d3ee" stroke-width="1.5"/><text x="436" y="428" class="name">Hermes · VM</text><text x="436" y="453" class="small">Hermes and supporting tools</text><text x="436" y="475" class="small">No unrelated workloads</text></g>
-<g><rect x="790" y="245" width="330" height="118" rx="6" fill="#0f172a"/><rect x="790" y="245" width="330" height="118" rx="6" fill="#a78bfa" fill-opacity=".09" stroke="#a78bfa" stroke-width="1.5"/><text x="806" y="272" class="name">AI · LXC</text><text x="806" y="297" class="small">Ollama · Open WebUI</text><text x="806" y="319" class="small">AI tools / separate sharing</text><text x="806" y="341" class="small">Permitted private access</text></g>
-<text x="790" y="405" class="small">Guests are grouped by role.</text><text x="790" y="429" class="small">Migration may change placement.</text><text x="790" y="453" class="small">Shared storage / automatic HA</text><text x="790" y="477" class="small">are not asserted here.</text>
-<g><rect x="50" y="674" width="400" height="96" rx="6" fill="#0f172a"/><rect x="50" y="674" width="400" height="96" rx="6" fill="#fb923c" fill-opacity=".09" stroke="#fb923c" stroke-width="1.5"/><text x="66" y="701" class="name">Home notifications</text><text x="66" y="726" class="small">Local ntfy → permitted phone client</text><text x="66" y="748" class="small">One of two independent subscriptions</text></g>
-<g><rect x="665" y="674" width="455" height="96" rx="6" fill="#0f172a"/><rect x="665" y="674" width="455" height="96" rx="6" fill="#fbbf24" fill-opacity=".09" stroke="#fbbf24" stroke-width="1.5"/><text x="681" y="701" class="name">Offsite VPS · outside the cluster</text><text x="681" y="726" class="small">Watchdog + independent DNS + own ntfy</text><text x="681" y="748" class="small">Complements home monitoring; not a controller</text></g>
-<text x="48" y="819" class="small">Solid: normal web path  ·  Dashed: selected monitoring / notification paths</text>
-<text x="48" y="844" class="note">Scheduled backups: deferred pending NAS. NOT PROTECTED by a verified full restore process.</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+<title id="title">Five-node homelab placement, 12 November 2026</title>
+<desc id="desc">Five online Proxmox nodes. The diagram lists 17 running guests. Management and core-services remain running but are due for retirement. DNS and PostgreSQL guests occupy pve02, pve04 and pve05. Four stopped guests are listed in the inventory, not shown here. Placement does not prove service health or failover.</desc>
+<style>text{font-family:ui-monospace,Consolas,monospace;fill:#e2e8f0}.heading{font-size:25px;font-weight:700}.node{font-size:20px;font-weight:700;fill:#67e8f9}.label{font-size:14px}.note{font-size:14px;fill:#cbd5e1}</style>
+<rect width="1200" height="760" rx="16" fill="#0f172a"/>
+<text x="36" y="48" class="heading">HOMELAB / five hosts, shared infrastructure</text>
+<text x="36" y="80" class="note">Observed 2026-11-12 · 5 online nodes · quorate · 21 guests (17 running / 4 stopped)</text>
+
+<g><rect x="36" y="118" width="364" height="174" rx="10" fill="#020617" stroke="#475569"/><text x="52" y="151" class="node">pve01</text>
+<text x="52" y="186" class="label">management01 — retirement pending</text>
+<text x="52" y="217" class="label">vpn01</text>
+<text x="52" y="248" class="label">ntp01</text>
+</g>
+<g><rect x="416" y="118" width="364" height="174" rx="10" fill="#020617" stroke="#475569"/><text x="432" y="151" class="node">pve02</text>
+<text x="432" y="186" class="label">core-services — retirement pending</text>
+<text x="432" y="217" class="label">dns1</text>
+<text x="432" y="248" class="label">pg1</text>
+</g>
+<g><rect x="796" y="118" width="364" height="174" rx="10" fill="#020617" stroke="#475569"/><text x="812" y="151" class="node">pve03</text>
+<text x="812" y="186" class="label">unifi-server-os</text>
+<text x="812" y="217" class="label">ai01 · media01</text>
+<text x="812" y="248" class="label">openclaw</text>
+</g>
+<g><rect x="36" y="318" width="364" height="174" rx="10" fill="#020617" stroke="#475569"/><text x="52" y="351" class="node">pve04</text>
+<text x="52" y="386" class="label">firefly · traefik</text>
+<text x="52" y="417" class="label">dns2</text>
+<text x="52" y="448" class="label">pg2</text>
+</g>
+<g><rect x="416" y="318" width="364" height="174" rx="10" fill="#020617" stroke="#475569"/><text x="432" y="351" class="node">pve05</text>
+<text x="432" y="386" class="label">step-ca</text>
+<text x="432" y="417" class="label">dns3</text>
+<text x="432" y="448" class="label">pg3</text>
+</g>
+<g><rect x="796" y="318" width="364" height="174" rx="10" fill="#172033" stroke="#fbbf24"/>
+<text x="812" y="351" class="node">Lifecycle transition</text>
+<text x="812" y="386" class="label">Management + core still running.</text>
+<text x="812" y="417" class="label">Retirement is planned, not done.</text>
+<text x="812" y="448" class="label">No migration target/date asserted.</text></g>
+<text x="36" y="546" class="heading">Three hosts carry both DNS and PostgreSQL</text>
+<text x="36" y="579" class="note">dns1/pg1 → pve02 · dns2/pg2 → pve04 · dns3/pg3 → pve05</text>
+<text x="36" y="614" class="note">Guest distribution is not proof of replication, failover or independent site-level recovery.</text>
+<text x="36" y="663" class="note">Map shows running guests only; four stopped guests remain in the dated inventory.</text>
+<text x="36" y="693" class="note">No current external watchdog deployment or end-to-end notification delivery was established.</text>
+<text x="36" y="723" class="note">Addresses and private domains omitted. This is a placement snapshot, not a live health dashboard.</text>
 </svg>

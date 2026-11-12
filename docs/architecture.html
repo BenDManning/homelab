@@ -1,37 +1,22 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Homelab architecture</title><style>
-*{box-sizing:border-box}body{margin:0;padding:32px;background:#020617;color:#e2e8f0;font-family:ui-monospace,Consolas,monospace}main{max-width:1200px;margin:auto}h1{font-size:26px}p,li{line-height:1.6;color:#cbd5e1}.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#22d3ee;margin-right:12px}.diagram{border:1px solid #334155;border-radius:12px;overflow:auto}.diagram svg{display:block;width:100%;min-width:760px;height:auto}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:20px}.card{border:1px solid #334155;border-radius:8px;padding:18px;background:#0f172a}h2{font-size:16px;margin:0}ul{padding-left:18px;font-size:13px}footer{color:#94a3b8;font-size:12px;margin-top:20px}@media(max-width:700px){body{padding:16px}.cards{grid-template-columns:1fr}}a{color:#22d3ee}
-</style></head><body><main><header><h1><span class="dot"></span>Homelab architecture</h1><p>A service map, not a live health dashboard. Scroll the diagram horizontally on small screens.</p></header><div class="diagram"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 870" role="img" aria-labelledby="title desc">
-<title id="title">Homelab roles and access paths</title>
-<desc id="desc">Three Proxmox nodes host six guests. pve01 hosts DNS, management and time. pve02 hosts core services and Hermes. pve03 hosts AI. An external VPS checks home paths and sends independent alerts. Placement is a dated snapshot, not a high-availability claim.</desc>
-<defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#1e293b" stroke-width=".5"/></pattern>
-<marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8" fill="none" stroke="#94a3b8"/></marker></defs>
-<style>text{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;fill:#e2e8f0}.title{font-size:24px;font-weight:700}.name{font-size:17px;font-weight:600}.small{font-size:13px;fill:#cbd5e1}.note{font-size:12px;fill:#94a3b8}.group{fill:#020617;stroke:#64748b;stroke-dasharray:8 4}.line{fill:none;stroke:#94a3b8;stroke-width:1.5;marker-end:url(#arrow)}</style>
-<rect width="1200" height="870" rx="12" fill="#020617"/><rect width="1200" height="870" rx="12" fill="url(#grid)"/>
-<text x="36" y="44" class="title">HOMELAB / roles, not a flat pile of services</text>
-<text x="36" y="70" class="small">Placement snapshot · 2026-09-28 · addresses and identities omitted</text>
-<rect x="30" y="172" width="1140" height="416" rx="12" class="group"/>
-<text x="48" y="198" class="small">HOME · Proxmox management remains LAN-only</text>
-<!-- Draw connections before opaque component cards. -->
-<path d="M600 146V235" class="line"/><text x="613" y="162" class="note">internal DNS + HTTPS</text>
-<path d="M415 276H390V345H365" class="line"/>
-<path d="M50 431H40V640H180V674" class="line" stroke-dasharray="5 5"/>
-<path d="M845 674V618H385V399H365" class="line" stroke-dasharray="5 5"/>
-<text x="440" y="645" class="note">Selected home-path checks / Tailscale</text>
-<g><rect x="420" y="92" width="360" height="54" rx="6" fill="#0f172a"/><rect x="420" y="92" width="360" height="54" rx="6" fill="#22d3ee" fill-opacity=".09" stroke="#22d3ee" stroke-width="1.5"/><text x="436" y="119" class="name">Browser / permitted client</text></g>
-<text x="50" y="226" class="name">pve01</text>
-<text x="420" y="226" class="name">pve02</text>
-<text x="790" y="226" class="name">pve03</text>
-<g><rect x="50" y="245" width="315" height="76" rx="6" fill="#0f172a"/><rect x="50" y="245" width="315" height="76" rx="6" fill="#34d399" fill-opacity=".09" stroke="#34d399" stroke-width="1.5"/><text x="66" y="272" class="name">Network services · VM</text><text x="66" y="297" class="small">Technitium DNS</text></g>
-<g><rect x="50" y="337" width="315" height="118" rx="6" fill="#0f172a"/><rect x="50" y="337" width="315" height="118" rx="6" fill="#34d399" fill-opacity=".09" stroke="#34d399" stroke-width="1.5"/><text x="66" y="364" class="name">Management · VM</text><text x="66" y="389" class="small">Metrics + alerts · Semaphore</text><text x="66" y="411" class="small">Homepage + BookStack</text><text x="66" y="433" class="small">Local controller stays here</text></g>
-<g><rect x="50" y="471" width="315" height="76" rx="6" fill="#0f172a"/><rect x="50" y="471" width="315" height="76" rx="6" fill="#34d399" fill-opacity=".09" stroke="#34d399" stroke-width="1.5"/><text x="66" y="498" class="name">Network time · LXC</text><text x="66" y="523" class="small">Chrony</text></g>
-<g><rect x="420" y="245" width="315" height="118" rx="6" fill="#0f172a"/><rect x="420" y="245" width="315" height="118" rx="6" fill="#fb7185" fill-opacity=".09" stroke="#fb7185" stroke-width="1.5"/><text x="436" y="272" class="name">Core services · VM</text><text x="436" y="297" class="small">Traefik · Portainer · Termix</text><text x="436" y="319" class="small">NetBox · Vaultwarden</text><text x="436" y="341" class="small">Infisical</text></g>
-<g><rect x="420" y="401" width="315" height="91" rx="6" fill="#0f172a"/><rect x="420" y="401" width="315" height="91" rx="6" fill="#22d3ee" fill-opacity=".09" stroke="#22d3ee" stroke-width="1.5"/><text x="436" y="428" class="name">Hermes · VM</text><text x="436" y="453" class="small">Hermes and supporting tools</text><text x="436" y="475" class="small">No unrelated workloads</text></g>
-<g><rect x="790" y="245" width="330" height="118" rx="6" fill="#0f172a"/><rect x="790" y="245" width="330" height="118" rx="6" fill="#a78bfa" fill-opacity=".09" stroke="#a78bfa" stroke-width="1.5"/><text x="806" y="272" class="name">AI · LXC</text><text x="806" y="297" class="small">Ollama · Open WebUI</text><text x="806" y="319" class="small">AI tools / separate sharing</text><text x="806" y="341" class="small">Permitted private access</text></g>
-<text x="790" y="405" class="small">Guests are grouped by role.</text><text x="790" y="429" class="small">Migration may change placement.</text><text x="790" y="453" class="small">Shared storage / automatic HA</text><text x="790" y="477" class="small">are not asserted here.</text>
-<g><rect x="50" y="674" width="400" height="96" rx="6" fill="#0f172a"/><rect x="50" y="674" width="400" height="96" rx="6" fill="#fb923c" fill-opacity=".09" stroke="#fb923c" stroke-width="1.5"/><text x="66" y="701" class="name">Home notifications</text><text x="66" y="726" class="small">Local ntfy → permitted phone client</text><text x="66" y="748" class="small">One of two independent subscriptions</text></g>
-<g><rect x="665" y="674" width="455" height="96" rx="6" fill="#0f172a"/><rect x="665" y="674" width="455" height="96" rx="6" fill="#fbbf24" fill-opacity=".09" stroke="#fbbf24" stroke-width="1.5"/><text x="681" y="701" class="name">Offsite VPS · outside the cluster</text><text x="681" y="726" class="small">Watchdog + independent DNS + own ntfy</text><text x="681" y="748" class="small">Complements home monitoring; not a controller</text></g>
-<text x="48" y="819" class="small">Solid: normal web path  ·  Dashed: selected monitoring / notification paths</text>
-<text x="48" y="844" class="note">Scheduled backups: deferred pending NAS. NOT PROTECTED by a verified full restore process.</text>
-</svg>
-</div><div class="cards"><section class="card"><h2>Separate responsibilities</h2><ul><li>Management is the local controller.</li><li>Hermes stays dedicated to Hermes tooling.</li><li>AI sharing has a separate access path.</li></ul></section><section class="card"><h2>Two alert paths</h2><ul><li>Home monitoring observes services and hosts.</li><li>Offsite checks survive a home-side outage.</li><li>Loss of contact is not a diagnosis of cause.</li></ul></section><section class="card"><h2>Recovery work remains</h2><ul><li>Scheduled backups await a NAS.</li><li>Persistence is not a restore test.</li><li>Current status: NOT PROTECTED.</li></ul></section></div><footer>Placement snapshot: 2026-09-28. Offline page with no scripts, fonts, trackers, or external dependencies. <a href="architecture.svg">Standalone SVG</a></footer></main></body></html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Five-node homelab architecture</title>
+<style>body{margin:0;padding:24px;background:#020617;color:#e2e8f0;font:16px/1.6 system-ui,sans-serif}main{max-width:1200px;margin:auto}a{color:#67e8f9}.diagram{overflow:auto}img{display:block;width:100%;min-width:760px}li{margin-block:8px}</style>
+</head>
+<body><main>
+<h1>Five-node homelab architecture</h1>
+<p>Placement observed on 12 November 2026, not a live health dashboard. The diagram
+shows 17 running guests; the inventory also records four stopped guests.</p>
+<div class="diagram"><img src="architecture.svg" alt="Five-node Proxmox map: pve01 management, VPN, NTP; pve02 core, DNS1, PG1; pve03 UniFi, AI, media, OpenClaw; pve04 Firefly, Traefik, DNS2, PG2; pve05 step-ca, DNS3, PG3. Management and core are due for retirement."></div>
+<ul>
+<li>Management and core-services remain running but are due for retirement.</li>
+<li>DNS and PostgreSQL members share three physical host failure domains.</li>
+<li>Guest state does not establish application health, failover or recovery.</li>
+<li>The external watchdog is published code, not an observed deployed component.</li>
+</ul>
+<p><a href="architecture.svg">Standalone SVG</a> · <a href="inventory.md">Inventory</a> ·
+<a href="services/README.md">Service designs</a> · <a href="verification.md">Verification</a></p>
+<p>The SVG is the single diagram source; this page embeds it rather than maintaining
+a second map. Offline page: no scripts, trackers, fonts or external dependencies.</p>
+</main></body></html>

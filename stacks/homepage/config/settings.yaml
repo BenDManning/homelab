@@ -25,6 +25,8 @@ layout:
     style: column
   Monitoring:
     style: column
+  Identity:
+    style: column
   Secrets:
     style: column
   AI and tools:
