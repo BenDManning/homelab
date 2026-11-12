@@ -1,9 +1,12 @@
-# DNS: one endpoint, three resolvers
+# DNS: fixing something that kept breaking
 
-The DNS design separates the address clients use from the resolvers answering
-queries. Keepalived manages a virtual address, dnsdist fronts three Technitium
-members, and native catalog replication distributes private authoritative zones.
-Recursive requests use a same-member DNSCrypt upstream.
+My DNS setup was fragile and broke frequently. I deployed a cluster because I
+wanted it to be more resilient.
+
+The cluster has three Technitium resolvers behind dnsdist. Keepalived manages the
+virtual address clients use, so they do not need to know which member is
+answering. Technitium's native catalog replication distributes private
+authoritative zones. Recursive requests go through DNSCrypt on the same member.
 
 ```mermaid
 flowchart LR
@@ -15,29 +18,29 @@ flowchart LR
   T --> P[PostgreSQL query logging]
 ```
 
-## Why separate ingress from resolution?
+## Keeping the client side simple
 
-Clients keep a stable resolver address while dnsdist distributes requests across
-members. Zone replication handles authoritative data separately from ingress
-ownership. This avoids making a client configuration change part of routine
-member maintenance.
+Clients keep the same resolver address when a member is down or being
+maintained. Keepalived handles that address, dnsdist distributes queries,
+and Technitium handles the DNS data. Those are separate jobs; moving the address
+does not replicate a zone or fix a broken upstream.
 
-The resolver members span three physical hosts. DNS and PostgreSQL share those
-host failure domains: adding guests does not add independent hardware.
+The resolvers span three physical hosts. They share those hosts with PostgreSQL,
+so the two clusters are not independent of each other's hardware failures.
 
-## Transport and observability
+## What the extra pieces do—and do not do
 
-The client-facing encrypted transport is DoT. The dnsdist-to-Technitium hop is
-plain TCP, so the complete path is not end-to-end encrypted. PROXY metadata
-preserves the source visible at ingress; it cannot recover an address already
+Clients can use DoT for encrypted DNS. The hop from dnsdist to Technitium is plain
+TCP, though, so this is not an end-to-end encrypted path. PROXY metadata carries
+the source address visible at ingress; it cannot recover an address already
 hidden by NAT.
 
-Private-zone answers and external recursion need separate health checks. A
-working internal record does not establish that recursive upstreams are usable.
-PostgreSQL-backed query logging adds another dependency and a retention concern;
-it should not be confused with the resolver's ability to answer queries.
+A private-zone lookup and an external recursive lookup exercise different parts
+of the setup. One can work while the other is broken. Likewise, a running DNS
+process alone does not establish that clients can get answers or that the
+virtual address moves correctly during failover.
 
-A useful failover test has to check client answers and endpoint movement, not
-just that the DNS processes are running.
+Query logs go to PostgreSQL. That adds a database dependency and retained query
+data, but logging and answering queries are different concerns.
 
-[Database design](postgresql.md) · [Recovery](../operations.md)
+[PostgreSQL cluster](postgresql.md) · [Recovery](../operations.md)

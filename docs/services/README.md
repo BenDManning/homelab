@@ -1,9 +1,11 @@
 # Infrastructure designs
 
-These notes follow three paths through the lab:
+These are a few things I have built in the lab, for different reasons:
 
-- [DNS](dns.md): from a client query to private zones or an upstream resolver.
-- [PostgreSQL](postgresql.md): from a client endpoint to the elected writer.
+- [DNS](dns.md): my old setup kept breaking, so I built a cluster to make it more
+  resilient.
+- [PostgreSQL](postgresql.md): I was bored, started watching a cluster-building
+  series, and discovered how involved it was. I ended up using Patroni.
 - [Certificates and routing](access-and-identity.md): from frontend TLS to backend
   identity, including the CA's database dependency.
 

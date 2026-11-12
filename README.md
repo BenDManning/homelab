@@ -11,10 +11,10 @@ writer, where TLS ends, and how an alert survives a failed delivery.
 
 ## Infrastructure designs
 
-- **[DNS](docs/services/dns.md)** — one client endpoint in front of three
-  resolver members, with private zones and encrypted recursive upstreams.
-- **[PostgreSQL](docs/services/postgresql.md)** — Patroni leadership, HAProxy
-  routing and the difference between a replica and a backup.
+- **[DNS](docs/services/dns.md)** — my DNS kept breaking, so I built a
+  three-resolver cluster to make it more resilient.
+- **[PostgreSQL](docs/services/postgresql.md)** — a curiosity project that got
+  more complicated than I expected, ending up with Patroni, etcd and HAProxy.
 - **[Certificates and routing](docs/services/access-and-identity.md)** — frontend
   HTTPS, backend identity checks and a CA whose database dependency complicates
   recovery.
