@@ -1,15 +1,11 @@
-# Service design index
+# Infrastructure designs
 
-These public summaries describe the current documented direction without exporting
-private deployment files. They separate the 12 November runtime observation from
-earlier maintained configuration records. They are not deployment recipes.
+These notes follow three paths through the lab:
 
-| Subsystem | Design question | Public summary |
-| --- | --- | --- |
-| DNS | How does one client endpoint use three resolver guests? | [DNS pool](dns.md) |
-| PostgreSQL | How do leadership, client routing and consumers differ? | [Single-writer database cluster](postgresql.md) |
-| Routing and identity | Where does TLS terminate, and what depends on the CA? | [Access and certificates](access-and-identity.md) |
+- [DNS](dns.md): from a client query to private zones or an upstream resolver.
+- [PostgreSQL](postgresql.md): from a client endpoint to the elected writer.
+- [Certificates and routing](access-and-identity.md): from frontend TLS to backend
+  identity, including the CA's database dependency.
 
-[Inventory](../inventory.md) owns dated guest placement; [verification](../verification.md)
-owns evidence limits. Actual addresses, trust material, native configurations,
-application data and operational credentials remain private.
+The [architecture diagram](../architecture.html) shows their relationships;
+[recovery notes](../operations.md) explain what replication leaves unsolved.

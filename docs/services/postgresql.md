@@ -1,17 +1,14 @@
 # PostgreSQL: one writer, separate routing
 
-## Documented design
-
-Three database containers live on pve02, pve04 and pve05. Maintained November
-records describe PostgreSQL managed by Patroni with an etcd coordination layer.
-HAProxy routes the client writer endpoint to the current primary; Keepalived
-owns the client virtual address. These routes run with the database guests,
-not through the web reverse proxy.
+The database design uses three PostgreSQL members managed by Patroni, with etcd
+for coordination. HAProxy directs the writer endpoint to the current primary;
+Keepalived manages the client virtual address. Database traffic does not pass
+through the web reverse proxy.
 
 ```mermaid
 flowchart LR
-  W[Writing consumers] -->|Writer endpoint| H[VIP / HAProxy]
-  H --> P[Current PostgreSQL primary]
+  W[Writing clients] -->|Writer endpoint| H[VIP / HAProxy]
+  H --> P[Current primary]
   P --> S[Synchronous standby]
   P --> A[Other streaming replica]
   D[Patroni / etcd] -.-> P
@@ -19,33 +16,28 @@ flowchart LR
   D -.-> A
 ```
 
-This is single-writer HA, not multi-primary SQL. The documented policy uses one
-synchronous standby; it does not make all replicas equally current. The separate
-replica endpoint may lag and is not causal read-after-write routing. HAProxy
-routing is not SQL connection pooling or a security-enforced read-only boundary.
+## Leadership is not routing
 
-## Consumers and failure domains
+Patroni decides which member can lead. HAProxy gives clients a stable route to
+that member. The two mechanisms solve different problems: moving an address
+without checking leadership could send writes to the wrong server.
 
-DNS query logging, CA authoritative state and the CA dashboard's own state use
-separate database roles. The dashboard's CA-state reader is distinct from its
-application-state writer. Least-privilege roles and verified TLS are documented
-configuration boundaries, not implied by the existence of the guests.
+The policy uses one synchronous standby, not three writable databases. The
+replica endpoint can lag, so it is unsuitable for reads that must immediately
+observe a previous write. HAProxy is neither a connection pool nor a
+security-enforced read-only boundary.
 
-DNS and database members are distributed across the same three physical hosts.
-Six guests therefore do not represent six independent host failure domains.
-Replicas do not protect against propagated deletion, bad application writes or
-loss of the whole site. Local consumer dumps do not establish recovery of etcd,
-the complete cluster, every consumer or offsite copies.
+## Shared database service, separate permissions
 
-## What was checked
+DNS query logging and the certificate authority use separate database roles.
+The CA administration application's own data is separate from its read access
+to CA state. This keeps a UI's ordinary database credentials distinct from the
+CA's authoritative writer.
 
-On 12 November all three PostgreSQL guests were running. Only pg1 received a fresh
-in-guest check: Patroni, HAProxy and Keepalived reported active. The fresh check did
-not inspect replication roles, replay lag, etcd quorum, SQL writes, TLS or VIP ownership.
+The database and DNS members share three host failure domains. Replication helps
+with member loss but also propagates bad writes and deletions. It does not
+replace backups, and consumer SQL dumps alone do not recover etcd or the complete
+database cluster. This write-up does not claim measured failover times or a
+full-cluster restore result.
 
-Maintained 11 November records report one primary and two streaming replicas,
-selected consumer TLS connections and scoped CA/dashboard dump-and-restore work.
-Those results are reported private evidence, not a fresh forced failover or a
-public full-cluster restore demonstration. No measured RPO/RTO is claimed.
-
-[CA dependency cycle](access-and-identity.md) · [Verification](../verification.md)
+[Certificate dependencies](access-and-identity.md) · [Recovery](../operations.md)

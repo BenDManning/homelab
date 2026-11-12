@@ -1,15 +1,5 @@
 # Offsite watchdog
 
-## Publication status — November 2026
-
-This is retained source and a configurable example, not evidence of a current VPS
-deployment. The lab's management and core-services VMs are due for retirement;
-the fixed `management_http`, `management_ssh`, `core` and `network` roles model
-the older layout. A successor design must revisit those semantics, targets and
-failure domains before using the classifier for the new service arrangement.
-Changing example addresses alone is not that redesign. No live probes or
-notifications were sent during this repository revision.
-
 A Linux/Python reachability observer with a durable SQLite notification outbox.
 Run it outside the home's power and network failure domain. Requires Python 3.10+
 with its standard library; systemd is optional. No packages or ntfy server are included.
@@ -118,5 +108,4 @@ loses queued events and starts debounce again.
 Reachability symptoms are **not proof of power loss or an ISP outage**. Routing,
 firewall or overlay failures can look identical; offsite-host/ntfy failure can
 prevent immediate alerts. Local tests do not verify real ntfy auth, deployed TLS,
-phone delivery, reboot behavior or whole-home outage performance. Those require
-separately authorized operational tests.
+phone delivery, reboot behavior or whole-home outage performance. Those need deployment-specific tests.

@@ -1,48 +1,34 @@
-# Access, certificates and shared dependencies
+# Certificates and routing
 
-## Proxy placement is no longer the old core-services layout
+Traefik handles application routing using its watched File provider. DNS records
+and routes are explicit rather than discovered through a Docker socket.
 
-The 12 November inventory places a dedicated Traefik container on pve04 and a
-step-ca VM on pve05. The old core-services VM remains running on pve02 and is due
-for retirement; this does not imply all of its applications have moved.
+Three connection types need different handling:
 
-Maintained November records describe manual DNS records and Traefik's native
-watched File provider, not automatic Docker/Proxmox service discovery. Three
-routing cases must remain distinct:
-
-| Route type | TLS boundary | Why it matters |
+| Connection | TLS boundary | Reason |
 | --- | --- | --- |
-| Application frontend | Browser HTTPS terminates at Traefik | Frontend reachability is not authenticated app acceptance |
-| Selected private backends | A separate TLS connection verifies backend name and root | A frontend certificate does not verify the backend identity |
-| Certificate authority | Exact-SNI TCP passthrough; CA terminates TLS/mTLS | HTTP termination is not interchangeable with preserving client mTLS |
+| Browser to application frontend | HTTPS terminates at Traefik | Presents the frontend certificate and routes HTTP |
+| Proxy to selected backend | A separate TLS connection verifies the backend name and root | Protects the backend hop as well as the frontend |
+| Client to certificate authority | Exact-SNI TCP passthrough; the CA terminates TLS/mTLS | Preserves client-certificate authentication |
 
-The documented administration API is loopback-only. Public example links do not
-create DNS records, trust roots, proxy routes, permissions or remote-access rules.
-A current working application cannot be inferred from a Homepage card.
+A frontend certificate says nothing about whether the proxy verifies its backend.
+Likewise, turning a CA route into ordinary HTTP termination would change who
+receives and verifies a client's certificate.
 
-## CA and database depend on one another
+## The CA/database dependency cycle
 
-Maintained 11 November records describe step-ca using PostgreSQL for authoritative
-state and hardware-backed intermediate signing. The dashboard has a scoped CA
-administration identity, a SELECT-only CA-state SQL role and a separate app-state
-writer; it is not the operator's root or Super Admin identity.
+The step-ca design stores authoritative state in PostgreSQL and uses
+hardware-backed intermediate signing. Its administration application has a
+scoped CA identity, a read-only CA-state database role and a separate writer for
+its own application data.
 
-The CA needs the database to start, while database certificate renewal needs the
-CA. Recovery therefore requires more than restarting guests in arbitrary order:
-certificate validity, independent signing recovery, protected keys and compatible
-database state are separate dependencies. A rehearsed break-glass substep does
-not demonstrate full CA/database disaster recovery.
+The CA needs the database to start, but database certificate renewal needs the
+CA. That creates a recovery cycle: restarting everything in an arbitrary order
+is not enough if the database certificate has expired. Certificate validity,
+recoverable signing material and compatible database state all matter.
 
-A separate OpenClaw guest is present on pve03. Maintained records describe its
-HTTPS/WSS publication and renewal lifecycle; its presence does not prove every
-browser, mobile path or renewal is healthy today. Broader identity-provider,
-SSH-CA and Wi-Fi identity work remains planning, not an implemented capability.
+Hardware-backed signing protects a key; it does not by itself make the service
+recoverable. These notes explain the dependencies, not a completed disaster
+recovery exercise.
 
-## Evidence boundary
-
-Fresh 12 November inspection establishes guest placement/running state, not
-proxy configuration, certificate issuance or rendered browser behavior. Design
-statements above summarize dated private records. Private endpoints, key custody,
-credential references and live configuration are intentionally not reproduced.
-
-[Verification](../verification.md) · [Recovery](../operations.md)
+[Database design](postgresql.md) · [Recovery](../operations.md)

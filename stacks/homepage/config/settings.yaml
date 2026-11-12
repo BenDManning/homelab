@@ -17,17 +17,9 @@ quicklaunch:
   showSearchSuggestions: false
   mobileButtonPosition: bottom-right
 layout:
-  Management:
+  Documentation:
     style: column
-  Proxmox - LAN only:
-    style: column
-  Network:
+  Infrastructure:
     style: column
   Monitoring:
-    style: column
-  Identity:
-    style: column
-  Secrets:
-    style: column
-  AI and tools:
     style: column

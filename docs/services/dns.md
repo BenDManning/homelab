@@ -1,43 +1,43 @@
-# DNS: shared ingress, distributed resolvers
+# DNS: one endpoint, three resolvers
 
-## Documented design
-
-The maintained November configuration records describe three DNS containers on
-pve02, pve04 and pve05. Keepalived gives clients one virtual address; dnsdist
-fronts a pool of Technitium members. Native catalog replication distributes the
-private authoritative zones. Recursive queries use same-node DNSCrypt upstreams.
+The DNS design separates the address clients use from the resolvers answering
+queries. Keepalived manages a virtual address, dnsdist fronts three Technitium
+members, and native catalog replication distributes private authoritative zones.
+Recursive requests use a same-member DNSCrypt upstream.
 
 ```mermaid
 flowchart LR
   C[Clients] -->|UDP/TCP DNS or DoT| V[Keepalived VIP / dnsdist]
-  V -->|Plain TCP with PROXY metadata| T[Technitium members]
+  V -->|Plain TCP with PROXY metadata| T[Technitium resolver pool]
   T --> A[Private authoritative zones]
-  T -->|Recursive queries / loopback| D[DNSCrypt]
+  T -->|Loopback| D[DNSCrypt]
   D -->|Encrypted upstream via relays| U[External recursive resolvers]
   T --> P[PostgreSQL query logging]
 ```
 
-The plaintext dnsdist-to-Technitium leg matters: encryption on the client and
-upstream edges does not make the whole path end-to-end encrypted. The documented
-November transport disables the lab's own DoH endpoint while retaining DoT.
-PROXY metadata preserves the client source visible at ingress, not an identity
-already hidden by another NAT boundary.
+## Why separate ingress from resolution?
 
-Private authoritative health and external recursive health are different checks.
-The query logger adds a database dependency and data-retention responsibility;
-logging configuration alone does not establish bounded retention or log backups.
+Clients keep a stable resolver address while dnsdist distributes requests across
+members. Zone replication handles authoritative data separately from ingress
+ownership. This avoids making a client configuration change part of routine
+member maintenance.
 
-## What was checked
+The resolver members span three physical hosts. DNS and PostgreSQL share those
+host failure domains: adding guests does not add independent hardware.
 
-On 12 November, all three DNS guests were running in the hypervisor inventory.
-Only dns1 received a fresh service-manager check: DNS, dnsdist, dnscrypt-proxy,
-nginx and Keepalived reported started. This does not revalidate every configuration
-line, VIP election, client resolver choice or all-node answers.
+## Transport and observability
 
-Earlier private records include selected all-node/VIP answers and a scoped restore
-exercise. Those are dated observations, not a public reproducible receipt or proof
-of current whole-system failover. Current client/VLAN coverage, query-history
-retention, delivered alerts and complete recovery remain unresolved by this repo.
+The client-facing encrypted transport is DoT. The dnsdist-to-Technitium hop is
+plain TCP, so the complete path is not end-to-end encrypted. PROXY metadata
+preserves the source visible at ingress; it cannot recover an address already
+hidden by NAT.
 
-[Inventory](../inventory.md) · [Verification](../verification.md) ·
-[PostgreSQL dependency](postgresql.md)
+Private-zone answers and external recursion need separate health checks. A
+working internal record does not establish that recursive upstreams are usable.
+PostgreSQL-backed query logging adds another dependency and a retention concern;
+it should not be confused with the resolver's ability to answer queries.
+
+A useful failover test has to check client answers and endpoint movement, not
+just that the DNS processes are running.
+
+[Database design](postgresql.md) · [Recovery](../operations.md)

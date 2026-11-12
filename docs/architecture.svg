@@ -1,45 +1,32 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
-<title id="title">Five-node homelab placement, 12 November 2026</title>
-<desc id="desc">Five online Proxmox nodes. The diagram lists 17 running guests. Management and core-services remain running but are due for retirement. DNS and PostgreSQL guests occupy pve02, pve04 and pve05. Four stopped guests are listed in the inventory, not shown here. Placement does not prove service health or failover.</desc>
-<style>text{font-family:ui-monospace,Consolas,monospace;fill:#e2e8f0}.heading{font-size:25px;font-weight:700}.node{font-size:20px;font-weight:700;fill:#67e8f9}.label{font-size:14px}.note{font-size:14px;fill:#cbd5e1}</style>
-<rect width="1200" height="760" rx="16" fill="#0f172a"/>
-<text x="36" y="48" class="heading">HOMELAB / five hosts, shared infrastructure</text>
-<text x="36" y="80" class="note">Observed 2026-11-12 · 5 online nodes · quorate · 21 guests (17 running / 4 stopped)</text>
-
-<g><rect x="36" y="118" width="364" height="174" rx="10" fill="#020617" stroke="#475569"/><text x="52" y="151" class="node">pve01</text>
-<text x="52" y="186" class="label">management01 — retirement pending</text>
-<text x="52" y="217" class="label">vpn01</text>
-<text x="52" y="248" class="label">ntp01</text>
-</g>
-<g><rect x="416" y="118" width="364" height="174" rx="10" fill="#020617" stroke="#475569"/><text x="432" y="151" class="node">pve02</text>
-<text x="432" y="186" class="label">core-services — retirement pending</text>
-<text x="432" y="217" class="label">dns1</text>
-<text x="432" y="248" class="label">pg1</text>
-</g>
-<g><rect x="796" y="118" width="364" height="174" rx="10" fill="#020617" stroke="#475569"/><text x="812" y="151" class="node">pve03</text>
-<text x="812" y="186" class="label">unifi-server-os</text>
-<text x="812" y="217" class="label">ai01 · media01</text>
-<text x="812" y="248" class="label">openclaw</text>
-</g>
-<g><rect x="36" y="318" width="364" height="174" rx="10" fill="#020617" stroke="#475569"/><text x="52" y="351" class="node">pve04</text>
-<text x="52" y="386" class="label">firefly · traefik</text>
-<text x="52" y="417" class="label">dns2</text>
-<text x="52" y="448" class="label">pg2</text>
-</g>
-<g><rect x="416" y="318" width="364" height="174" rx="10" fill="#020617" stroke="#475569"/><text x="432" y="351" class="node">pve05</text>
-<text x="432" y="386" class="label">step-ca</text>
-<text x="432" y="417" class="label">dns3</text>
-<text x="432" y="448" class="label">pg3</text>
-</g>
-<g><rect x="796" y="318" width="364" height="174" rx="10" fill="#172033" stroke="#fbbf24"/>
-<text x="812" y="351" class="node">Lifecycle transition</text>
-<text x="812" y="386" class="label">Management + core still running.</text>
-<text x="812" y="417" class="label">Retirement is planned, not done.</text>
-<text x="812" y="448" class="label">No migration target/date asserted.</text></g>
-<text x="36" y="546" class="heading">Three hosts carry both DNS and PostgreSQL</text>
-<text x="36" y="579" class="note">dns1/pg1 → pve02 · dns2/pg2 → pve04 · dns3/pg3 → pve05</text>
-<text x="36" y="614" class="note">Guest distribution is not proof of replication, failover or independent site-level recovery.</text>
-<text x="36" y="663" class="note">Map shows running guests only; four stopped guests remain in the dated inventory.</text>
-<text x="36" y="693" class="note">No current external watchdog deployment or end-to-end notification delivery was established.</text>
-<text x="36" y="723" class="note">Addresses and private domains omitted. This is a placement snapshot, not a live health dashboard.</text>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="650" viewBox="0 0 1100 650" role="img" aria-labelledby="title desc">
+<title id="title">Selected homelab infrastructure</title><desc id="desc">Logical paths for DNS, application routing, database access and certificate renewal. Individual hosts and private applications are omitted.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10Z" fill="#94a3b8"/></marker></defs>
+<rect width="1100" height="650" rx="18" fill="#0b1220"/>
+<style>text{font-family:system-ui,sans-serif;fill:#e2e8f0}.label{font-size:13px;fill:#cbd5e1}.box{fill:#142237;stroke:#334e68;stroke-width:2}.heading{font-size:18px;font-weight:600}.detail{font-size:14px;fill:#cbd5e1}.line{fill:none;stroke:#94a3b8;stroke-width:2;marker-end:url(#arrow)}</style>
+<text x="42" y="48" font-size="25" font-weight="600">Homelab / selected infrastructure</text>
+<text x="42" y="76" class="detail">Five-node Proxmox lab · logical relationships, not host placement</text>
+<rect class="box" x="42" y="115" width="210" height="86" rx="12"/><text x="62" y="149" class="heading">Clients</text>
+<text x="62" y="177" class="detail">Stable service endpoints</text>
+<rect class="box" x="42" y="270" width="280" height="125" rx="12"/><text x="62" y="304" class="heading">DNS ingress + pool</text>
+<text x="62" y="332" class="detail">Keepalived / dnsdist</text>
+<text x="62" y="355" class="detail">Three Technitium members</text>
+<text x="62" y="378" class="detail">DNSCrypt upstreams</text>
+<rect class="box" x="410" y="270" width="280" height="125" rx="12"/><text x="430" y="304" class="heading">Application routing</text>
+<text x="430" y="332" class="detail">Traefik File provider</text>
+<text x="430" y="355" class="detail">Frontend + backend TLS</text>
+<text x="430" y="378" class="detail">CA traffic uses passthrough</text>
+<rect class="box" x="780" y="270" width="278" height="125" rx="12"/><text x="800" y="304" class="heading">Database endpoint</text>
+<text x="800" y="332" class="detail">Keepalived / HAProxy</text>
+<text x="800" y="355" class="detail">Patroni + etcd</text>
+<text x="800" y="378" class="detail">One writer, two replicas</text>
+<rect class="box" x="410" y="490" width="280" height="105" rx="12"/><text x="430" y="524" class="heading">Certificate authority</text>
+<text x="430" y="552" class="detail">step-ca / protected signing</text>
+<text x="430" y="575" class="detail">PostgreSQL-backed state</text>
+<path class="line" d="M147 201V270"/><text x="160" y="240" class="label">DNS</text>
+<path class="line" d="M252 158H550V270"/><text x="420" y="150" class="label">HTTPS</text>
+<path class="line" d="M252 183H920V270"/><text x="800" y="175" class="label">SQL clients</text>
+<path class="line" d="M322 352H370V440H920V395"/><text x="735" y="430" class="label">Query logging</text>
+<path class="line" d="M550 395V490"/><text x="563" y="468" class="label">TLS / mTLS passthrough</text>
+<path class="line" d="M690 525H990V395"/><text x="1000" y="466" class="label">CA state</text>
+<path class="line" d="M780 370H745V565H690"/><text x="758" y="560" class="label">Certificate renewal</text>
+<text x="42" y="625" class="label">DNS and database members share host failure domains. Replication is not a backup.</text></svg>

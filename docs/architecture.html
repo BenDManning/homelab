@@ -1,22 +1,15 @@
 <!doctype html>
 <html lang="en">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Five-node homelab architecture</title>
-<style>body{margin:0;padding:24px;background:#020617;color:#e2e8f0;font:16px/1.6 system-ui,sans-serif}main{max-width:1200px;margin:auto}a{color:#67e8f9}.diagram{overflow:auto}img{display:block;width:100%;min-width:760px}li{margin-block:8px}</style>
+<title>Homelab infrastructure design</title>
+<style>body{margin:0;padding:24px;background:#0b1220;color:#e2e8f0;font:16px/1.6 system-ui,sans-serif}main{max-width:1100px;margin:auto}a{color:#67e8f9}.diagram{overflow:auto}img{display:block;width:100%;min-width:700px}</style>
 </head>
 <body><main>
-<h1>Five-node homelab architecture</h1>
-<p>Placement observed on 12 November 2026, not a live health dashboard. The diagram
-shows 17 running guests; the inventory also records four stopped guests.</p>
-<div class="diagram"><img src="architecture.svg" alt="Five-node Proxmox map: pve01 management, VPN, NTP; pve02 core, DNS1, PG1; pve03 UniFi, AI, media, OpenClaw; pve04 Firefly, Traefik, DNS2, PG2; pve05 step-ca, DNS3, PG3. Management and core are due for retirement."></div>
-<ul>
-<li>Management and core-services remain running but are due for retirement.</li>
-<li>DNS and PostgreSQL members share three physical host failure domains.</li>
-<li>Guest state does not establish application health, failover or recovery.</li>
-<li>The external watchdog is published code, not an observed deployed component.</li>
-</ul>
-<p><a href="architecture.svg">Standalone SVG</a> · <a href="inventory.md">Inventory</a> ·
-<a href="services/README.md">Service designs</a> · <a href="verification.md">Verification</a></p>
-<p>The SVG is the single diagram source; this page embeds it rather than maintaining
-a second map. Offline page: no scripts, trackers, fonts or external dependencies.</p>
+<h1>Homelab infrastructure design</h1>
+<p>Selected service relationships in a five-node Proxmox lab. This is a logical
+view, not a map of individual hosts or applications.</p>
+<div class="diagram"><img src="architecture.svg" alt="Clients use DNS ingress, application routing and a database endpoint. DNS logging and the certificate authority use PostgreSQL. Database certificates are renewed through the CA."></div>
+<p><a href="services/dns.md">DNS</a> · <a href="services/postgresql.md">PostgreSQL</a> ·
+<a href="services/access-and-identity.md">Certificates and routing</a> ·
+<a href="operations.md">Recovery</a> · <a href="architecture.svg">SVG</a></p>
 </main></body></html>

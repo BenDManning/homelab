@@ -1,18 +1,9 @@
 # BookStack manual
 
-## Publication status — November 2026
-
-Retained new-instance example from the initial release, not a fresh export of
-the running wiki or a plan to move it. The management VM is due for retirement;
-this publication does not establish BookStack's successor placement. Image pins
-are historical example versions, not a current production/support claim.
-See [revision scope](../../docs/revision-2026-11.md).
-
 Pinned [LinuxServer BookStack](https://docs.linuxserver.io/images/docker-bookstack/)
 and MariaDB Compose example. The database has no published port. Application and
 database data use separate named volumes; the initial web binding is loopback
-only. This is a new-instance recipe, not an upgrade or import command for the
-existing wiki.
+only. This is a new-instance recipe, not an upgrade or import guide for an existing instance.
 
 ## Bootstrap privately
 
@@ -73,10 +64,8 @@ content already exists, changing `APP_URL` also requires BookStack's
 `bookstack:update-url` migration, with a database backup first; follow the
 upstream instructions rather than treating it as a harmless hostname edit.
 
-The original example described anonymous read/search and authenticated editing.
-That current live permission policy was not rechecked. To choose that policy for
-your own instance, enable public viewing in settings and give the Public role view/export
-permissions only—no create/update/delete permissions. Check a signed-out browser
+For anonymous reading with authenticated editing, enable public viewing in settings
+and give the Public role view/export permissions only—no create/update/delete permissions. Check a signed-out browser
 can read/search but cannot edit, then save a real edit using the editor account.
 This policy is not enabled automatically by Compose. Outbound email and emailed
 password resets are not configured by this example.
@@ -92,4 +81,4 @@ uploads), and the original `APP_KEY` plus credentials. A standalone HTML export
 is only an offline document copy. Follow the
 [BookStack backup/restore guide](https://www.bookstackapp.com/docs/admin/backup-restore/)
 and test a restore separately. This repository does not install a backup job or
-claim the lab has completed that test.
+include a restore test.
